@@ -22,7 +22,13 @@ Examples:
 Fastest option:
 
 ```bash
-make new-app NAME=billing PORT=4321
+dev-domains new-app --name billing --port 4321
+```
+
+If running from source before installation:
+
+```bash
+./bin/dev-domains new-app --name billing --port 4321
 ```
 
 That creates:
@@ -42,7 +48,7 @@ billing.test {
 ## 4. Reload Caddy
 
 ```bash
-make reload-caddy
+dev-domains reload
 ```
 
 ## 5. Start the app

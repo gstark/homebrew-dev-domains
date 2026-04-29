@@ -14,14 +14,15 @@ usage() {
 Usage: dev-domains <command> [args]
 
 Commands:
-  setup                 Run macOS dnsmasq/resolver setup
-  run                   Run Caddy with the bundled config
-  reload                Reload Caddy with the bundled config
-  validate              Validate the bundled Caddy config
-  trust                 Trust Caddy's local CA for HTTPS
-  new-app <name> <port> Create a new app config file
-  paths                 Print important installed paths
-  help                  Show this help
+  setup                             Run macOS dnsmasq/resolver setup
+  install-and-setup                 Install caddy and dnsmasq, then run setup
+  run                               Run Caddy with the bundled config
+  reload                            Reload Caddy with the bundled config
+  validate                          Validate the bundled Caddy config
+  trust                             Trust Caddy's local CA for HTTPS
+  new-app --name NAME --port PORT   Create a new app config file
+  paths                             Print important installed paths
+  help                              Show this help
 EOF
 }
 
@@ -30,6 +31,10 @@ shift || true
 
 case "$cmd" in
   setup)
+    exec "$SCRIPTS_DIR/setup-macos.sh"
+    ;;
+  install-and-setup)
+    brew install caddy dnsmasq
     exec "$SCRIPTS_DIR/setup-macos.sh"
     ;;
   run)

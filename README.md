@@ -45,6 +45,12 @@ Use `.test`.
    ./scripts/setup-macos.sh
    ```
 
+   Or use the CLI bootstrap command:
+
+   ```bash
+   ./bin/dev-domains install-and-setup
+   ```
+
 3. Start your dev servers.
 
 4. Open:
@@ -71,6 +77,12 @@ Use `.test`.
    dev-domains setup
    ```
 
+   Or, if you want one command for dependency install + setup outside normal Homebrew usage:
+
+   ```bash
+   dev-domains install-and-setup
+   ```
+
    This still needs sudo because it creates `/etc/resolver/test`.
 
 3. Start your dev servers.
@@ -95,10 +107,16 @@ Use `.test`.
 
 ## Adding a new app
 
-Use the helper:
+Use the CLI:
 
 ```bash
-make new-app NAME=newapp PORT=4321
+dev-domains new-app --name newapp --port 4321
+```
+
+If running from source before installation:
+
+```bash
+./bin/dev-domains new-app --name newapp --port 4321
 ```
 
 That creates:
@@ -108,7 +126,7 @@ That creates:
 Then reload Caddy:
 
 ```bash
-make reload-caddy
+dev-domains reload
 ```
 
 No `/etc/hosts` edits are needed.

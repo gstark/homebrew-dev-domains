@@ -14,7 +14,7 @@ help:
 	@echo "  make start-services   # Start dnsmasq and caddy via Homebrew"
 	@echo "  make stop-services    # Stop dnsmasq and caddy via Homebrew"
 	@echo "  make restart-dnsmasq  # Restart dnsmasq via Homebrew"
-	@echo "  make new-app NAME=foo PORT=3000  # Create app config"
+	@echo "  make new-app NAME=foo PORT=3000  # Create app config (legacy helper)"
 
 setup:
 	./scripts/setup-macos.sh
@@ -42,7 +42,4 @@ restart-dnsmasq:
 new-app:
 	@test -n "$(NAME)" || (echo "NAME is required, e.g. make new-app NAME=flux PORT=3000" && exit 1)
 	@test -n "$(PORT)" || (echo "PORT is required, e.g. make new-app NAME=flux PORT=3000" && exit 1)
-	mkdir -p $(CADDY_APPS_DIR)
-	printf "%s.test {\n\treverse_proxy localhost:%s\n}\n" "$(NAME)" "$(PORT)" > "$(CADDY_APPS_DIR)/$(NAME).caddy"
-	@echo "Created $(CADDY_APPS_DIR)/$(NAME).caddy"
-	@echo "Reload Caddy with: make reload-caddy"
+	./scripts/new-app.sh --name "$(NAME)" --port "$(PORT)"
