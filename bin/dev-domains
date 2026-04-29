@@ -46,6 +46,52 @@ list_apps() {
   fi
 }
 
+edit_app() {
+  local name=""
+  local port=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --name)
+        name="${2:-}"
+        shift 2
+        ;;
+      --port)
+        port="${2:-}"
+        shift 2
+        ;;
+      --help|-h)
+        echo "Usage: dev-domains edit-app --name NAME --port PORT"
+        return 0
+        ;;
+      *)
+        echo "Unknown argument: $1" >&2
+        return 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$name" || -z "$port" ]]; then
+    echo "Usage: dev-domains edit-app --name NAME --port PORT" >&2
+    return 1
+  fi
+
+  local file
+  file="$(app_file_for_name "$name")"
+  if [[ ! -f "$file" ]]; then
+    echo "App config not found: $file" >&2
+    return 1
+  fi
+
+  cat > "$file" <<EOF
+$name.test {
+	reverse_proxy localhost:$port
+}
+EOF
+
+  echo "Updated $file"
+  echo "Next: reload Caddy with 'dev-domains reload'"
+}
+
 remove_app() {
   local name=""
   while [[ $# -gt 0 ]]; do
@@ -110,6 +156,45 @@ open_app() {
   open "$(app_url_for_name "$name")"
 }
 
+service_state() {
+  local service="$1"
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "unknown"
+    return 0
+  fi
+
+  local line
+  line="$(brew services list 2>/dev/null | awk -v svc="$service" '$1 == svc {print}')"
+  if [[ -z "$line" ]]; then
+    echo "not-installed"
+  else
+    echo "$line" | awk '{print $2}'
+  fi
+}
+
+status() {
+  echo "dev-domains status"
+  echo
+  echo "Paths:"
+  echo "  root:      $ROOT"
+  echo "  caddyfile: $CADDYFILE"
+  echo "  apps:      $APPS_DIR"
+  echo
+  echo "Services:"
+  echo "  dnsmasq: $(service_state dnsmasq)"
+  echo "  caddy:   $(service_state caddy)"
+  echo
+  echo "Resolver:"
+  if [[ -f /etc/resolver/test ]]; then
+    echo "  /etc/resolver/test: present"
+  else
+    echo "  /etc/resolver/test: missing"
+  fi
+  echo
+  echo "Apps:"
+  list_apps
+}
+
 doctor() {
   local name="${1:-flux}"
   echo "dev-domains doctor"
@@ -132,14 +217,14 @@ doctor() {
     missing=1
   fi
 
-  if brew services list 2>/dev/null | grep -q '^dnsmasq\s.*started'; then
+  if [[ "$(service_state dnsmasq)" == "started" ]]; then
     echo "[ok] dnsmasq service is started"
   else
     echo "[warn] dnsmasq service does not appear started"
     missing=1
   fi
 
-  if brew services list 2>/dev/null | grep -q '^caddy\s.*started'; then
+  if [[ "$(service_state caddy)" == "started" ]]; then
     echo "[ok] caddy service is started"
   else
     echo "[warn] caddy service does not appear started"
@@ -175,9 +260,11 @@ Commands:
   validate                          Validate the bundled Caddy config
   trust                             Trust Caddy's local CA for HTTPS
   new-app --name NAME --port PORT   Create a new app config file
+  edit-app --name NAME --port PORT  Update an app's port
   list-apps                         List app configs
   remove-app --name NAME            Remove an app config file
   open --name NAME                  Open an app in the browser
+  status                            Show services, resolver, and configured apps
   doctor [name]                     Verify local setup, optionally testing NAME.test
   paths                             Print important installed paths
   help                              Show this help
@@ -210,6 +297,9 @@ case "$cmd" in
   new-app)
     exec "$SCRIPTS_DIR/new-app.sh" "$@"
     ;;
+  edit-app)
+    edit_app "$@"
+    ;;
   list-apps)
     list_apps
     ;;
@@ -218,6 +308,9 @@ case "$cmd" in
     ;;
   open)
     open_app "$@"
+    ;;
+  status)
+    status
     ;;
   doctor)
     doctor "$@"

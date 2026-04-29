@@ -129,6 +129,12 @@ List apps:
 dev-domains list-apps
 ```
 
+Edit an app port:
+
+```bash
+dev-domains edit-app --name newapp --port 5000
+```
+
 Reload Caddy:
 
 ```bash
@@ -145,6 +151,12 @@ Remove an app:
 
 ```bash
 dev-domains remove-app --name newapp
+```
+
+Check overall status:
+
+```bash
+dev-domains status
 ```
 
 No `/etc/hosts` edits are needed.

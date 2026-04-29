@@ -59,6 +59,12 @@ List apps:
 dev-domains list-apps
 ```
 
+Edit an app port:
+
+```bash
+dev-domains edit-app --name billing --port 5000
+```
+
 Open an app:
 
 ```bash
@@ -69,6 +75,12 @@ Remove an app:
 
 ```bash
 dev-domains remove-app --name billing
+```
+
+Check overall status:
+
+```bash
+dev-domains status
 ```
 
 ## 6. Start the app
