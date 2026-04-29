@@ -3,13 +3,64 @@ name: release-homebrew
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to package, for example v0.1.0
+        required: true
+        type: string
 
 jobs:
-  update-tap-example:
+  render-formula:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      TAP_REPO: ${{ vars.HOMEBREW_TAP_REPO }}
     steps:
-      - name: Show next steps
+      - uses: actions/checkout@v4
+
+      - name: Render Homebrew formula
         run: |
-          echo "Release published."
-          echo "Next: compute the tarball sha256 and update Formula/dev-domains.rb in your tap repo."
-          echo "Example tarball URL: https://github.com/${{ github.repository }}/archive/refs/tags/${{ github.event.release.tag_name }}.tar.gz"
+          scripts/render-homebrew-formula.sh "$TAG" Formula/dev-domains.rb
+
+      - name: Upload formula artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-domains-homebrew-formula-${{ env.TAG }}
+          path: Formula/dev-domains.rb
+
+      - name: Show release summary
+        run: |
+          echo "## Homebrew formula" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: $TAG" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Artifact: dev-domains-homebrew-formula-$TAG" >> "$GITHUB_STEP_SUMMARY"
+          echo >> "$GITHUB_STEP_SUMMARY"
+          echo '```ruby' >> "$GITHUB_STEP_SUMMARY"
+          cat Formula/dev-domains.rb >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Update tap repo
+        if: ${{ env.TAP_REPO != '' && secrets.HOMEBREW_TAP_TOKEN != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${GH_TOKEN}@github.com/${TAP_REPO}.git" tap
+          mkdir -p tap/Formula
+          cp Formula/dev-domains.rb tap/Formula/dev-domains.rb
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/dev-domains.rb
+          if git diff --cached --quiet; then
+            echo "No tap changes to commit."
+            exit 0
+          fi
+          git commit -m "Update dev-domains formula for ${TAG}"
+          git push origin HEAD
+
+      - name: Tap repo not configured
+        if: ${{ !(env.TAP_REPO != '' && secrets.HOMEBREW_TAP_TOKEN != '') }}
+        run: |
+          echo "Skipping tap update."
+          echo "Set repository variable HOMEBREW_TAP_REPO (for example gstark/homebrew-dev-domains)" \
+            "and secret HOMEBREW_TAP_TOKEN to enable automatic tap commits."
