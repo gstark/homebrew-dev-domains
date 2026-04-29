@@ -100,6 +100,7 @@ No `/etc/hosts` edits are needed.
 - [macOS setup](./docs/macos-setup.md)
 - [Adding apps](./docs/adding-apps.md)
 - [Local HTTPS](./docs/https.md)
+- [Homebrew install](./docs/homebrew.md)
 - [Repo structure](./docs/repo-structure.md)
 - [Troubleshooting](./docs/troubleshooting.md)
 - [Contributing](./CONTRIBUTING.md)

@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${DEV_DOMAINS_ROOT:-__DEV_DOMAINS_ROOT__}"
+if [[ "$ROOT" == "__DEV_DOMAINS_ROOT__" ]]; then
+  ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+fi
+
+SCRIPTS_DIR="$ROOT/scripts"
+CADDYFILE="$ROOT/caddy/Caddyfile"
+
+usage() {
+  cat <<EOF
+Usage: dev-domains <command> [args]
+
+Commands:
+  setup                 Run macOS dnsmasq/resolver setup
+  run                   Run Caddy with the bundled config
+  reload                Reload Caddy with the bundled config
+  validate              Validate the bundled Caddy config
+  trust                 Trust Caddy's local CA for HTTPS
+  new-app <name> <port> Create a new app config file
+  paths                 Print important installed paths
+  help                  Show this help
+EOF
+}
+
+cmd="${1:-help}"
+shift || true
+
+case "$cmd" in
+  setup)
+    exec "$SCRIPTS_DIR/setup-macos.sh"
+    ;;
+  run)
+    exec caddy run --config "$CADDYFILE"
+    ;;
+  reload)
+    exec caddy reload --config "$CADDYFILE"
+    ;;
+  validate)
+    exec caddy validate --config "$CADDYFILE"
+    ;;
+  trust)
+    exec caddy trust
+    ;;
+  new-app)
+    exec "$SCRIPTS_DIR/new-app.sh" "$@"
+    ;;
+  paths)
+    cat <<EOF
+Install root: $ROOT
+Caddyfile:    $CADDYFILE
+App configs:  $ROOT/caddy/apps
+Docs:         $ROOT/docs
+EOF
+    ;;
+  help|--help|-h)
+    usage
+    ;;
+  *)
+    echo "Unknown command: $cmd" >&2
+    echo >&2
+    usage >&2
+    exit 1
+    ;;
+esac

@@ -1,0 +1,15 @@
+name: release-homebrew
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-tap-example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show next steps
+        run: |
+          echo "Release published."
+          echo "Next: compute the tarball sha256 and update Formula/dev-domains.rb in your tap repo."
+          echo "Example tarball URL: https://github.com/${{ github.repository }}/archive/refs/tags/${{ github.event.release.tag_name }}.tar.gz"
