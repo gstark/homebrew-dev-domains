@@ -8,6 +8,160 @@ fi
 
 SCRIPTS_DIR="$ROOT/scripts"
 CADDYFILE="$ROOT/caddy/Caddyfile"
+APPS_DIR="$ROOT/caddy/apps"
+
+require_cmd() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Error: required command not found: $1" >&2
+    exit 1
+  fi
+}
+
+app_file_for_name() {
+  printf '%s/%s.caddy' "$APPS_DIR" "$1"
+}
+
+app_url_for_name() {
+  printf 'http://%s.test' "$1"
+}
+
+list_apps() {
+  if [[ ! -d "$APPS_DIR" ]]; then
+    return 0
+  fi
+
+  local found=0
+  shopt -s nullglob
+  for file in "$APPS_DIR"/*.caddy; do
+    found=1
+    local name port
+    name="$(basename "$file" .caddy)"
+    port="$(grep -Eo 'localhost:[0-9]+' "$file" | head -n1 | cut -d: -f2 || true)"
+    printf '%s\t%s\t%s\n' "$name" "$(app_url_for_name "$name")" "${port:-unknown}"
+  done
+  shopt -u nullglob
+
+  if [[ "$found" -eq 0 ]]; then
+    echo "No app configs found in $APPS_DIR"
+  fi
+}
+
+remove_app() {
+  local name=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --name)
+        name="${2:-}"
+        shift 2
+        ;;
+      --help|-h)
+        echo "Usage: dev-domains remove-app --name NAME"
+        return 0
+        ;;
+      *)
+        echo "Unknown argument: $1" >&2
+        return 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$name" ]]; then
+    echo "Usage: dev-domains remove-app --name NAME" >&2
+    return 1
+  fi
+
+  local file
+  file="$(app_file_for_name "$name")"
+  if [[ ! -f "$file" ]]; then
+    echo "App config not found: $file" >&2
+    return 1
+  fi
+
+  rm "$file"
+  echo "Removed $file"
+  echo "Next: reload Caddy with 'dev-domains reload'"
+}
+
+open_app() {
+  local name=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --name)
+        name="${2:-}"
+        shift 2
+        ;;
+      --help|-h)
+        echo "Usage: dev-domains open --name NAME"
+        return 0
+        ;;
+      *)
+        echo "Unknown argument: $1" >&2
+        return 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$name" ]]; then
+    echo "Usage: dev-domains open --name NAME" >&2
+    return 1
+  fi
+
+  require_cmd open
+  open "$(app_url_for_name "$name")"
+}
+
+doctor() {
+  local name="${1:-flux}"
+  echo "dev-domains doctor"
+  echo
+
+  local missing=0
+  for cmd in brew caddy dnsmasq dig; do
+    if command -v "$cmd" >/dev/null 2>&1; then
+      echo "[ok] command found: $cmd"
+    else
+      echo "[missing] command not found: $cmd"
+      missing=1
+    fi
+  done
+
+  if [[ -f /etc/resolver/test ]]; then
+    echo "[ok] resolver file exists: /etc/resolver/test"
+  else
+    echo "[missing] resolver file missing: /etc/resolver/test"
+    missing=1
+  fi
+
+  if brew services list 2>/dev/null | grep -q '^dnsmasq\s.*started'; then
+    echo "[ok] dnsmasq service is started"
+  else
+    echo "[warn] dnsmasq service does not appear started"
+    missing=1
+  fi
+
+  if brew services list 2>/dev/null | grep -q '^caddy\s.*started'; then
+    echo "[ok] caddy service is started"
+  else
+    echo "[warn] caddy service does not appear started"
+  fi
+
+  if command -v dig >/dev/null 2>&1; then
+    if dig +short "$name.test" @127.0.0.1 | grep -qx '127.0.0.1'; then
+      echo "[ok] DNS resolves for $name.test via 127.0.0.1"
+    else
+      echo "[warn] DNS did not resolve $name.test to 127.0.0.1 via local dnsmasq"
+      missing=1
+    fi
+  fi
+
+  echo
+  if [[ "$missing" -eq 0 ]]; then
+    echo "Doctor check passed."
+  else
+    echo "Doctor found issues. See docs/troubleshooting.md"
+    return 1
+  fi
+}
 
 usage() {
   cat <<EOF
@@ -21,6 +175,10 @@ Commands:
   validate                          Validate the bundled Caddy config
   trust                             Trust Caddy's local CA for HTTPS
   new-app --name NAME --port PORT   Create a new app config file
+  list-apps                         List app configs
+  remove-app --name NAME            Remove an app config file
+  open --name NAME                  Open an app in the browser
+  doctor [name]                     Verify local setup, optionally testing NAME.test
   paths                             Print important installed paths
   help                              Show this help
 EOF
@@ -51,6 +209,18 @@ case "$cmd" in
     ;;
   new-app)
     exec "$SCRIPTS_DIR/new-app.sh" "$@"
+    ;;
+  list-apps)
+    list_apps
+    ;;
+  remove-app)
+    remove_app "$@"
+    ;;
+  open)
+    open_app "$@"
+    ;;
+  doctor)
+    doctor "$@"
     ;;
   paths)
     cat <<EOF

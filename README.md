@@ -105,9 +105,9 @@ Use `.test`.
 - `docs/macos-setup.md` — step-by-step setup
 - `docs/adding-apps.md` — how to add more projects
 
-## Adding a new app
+## Managing apps
 
-Use the CLI:
+Create an app:
 
 ```bash
 dev-domains new-app --name newapp --port 4321
@@ -123,10 +123,28 @@ That creates:
 
 - `caddy/apps/newapp.caddy`
 
-Then reload Caddy:
+List apps:
+
+```bash
+dev-domains list-apps
+```
+
+Reload Caddy:
 
 ```bash
 dev-domains reload
+```
+
+Open an app:
+
+```bash
+dev-domains open --name newapp
+```
+
+Remove an app:
+
+```bash
+dev-domains remove-app --name newapp
 ```
 
 No `/etc/hosts` edits are needed.
@@ -136,6 +154,7 @@ No `/etc/hosts` edits are needed.
 - If a dev server rejects custom hostnames, configure that app to allow them.
 - Some frameworks also need `--host 0.0.0.0` or similar.
 - HTTPS is supported too; see the HTTPS doc.
+- Use `dev-domains doctor` to verify your local setup.
 - `brew install dev-domains` can install dependencies automatically, but it should not silently perform privileged system setup during formula installation.
 
 ## Docs

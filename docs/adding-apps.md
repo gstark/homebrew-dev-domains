@@ -51,11 +51,31 @@ billing.test {
 dev-domains reload
 ```
 
-## 5. Start the app
+## 5. Optional helper commands
+
+List apps:
+
+```bash
+dev-domains list-apps
+```
+
+Open an app:
+
+```bash
+dev-domains open --name billing
+```
+
+Remove an app:
+
+```bash
+dev-domains remove-app --name billing
+```
+
+## 6. Start the app
 
 Make sure your app is actually listening on the port you configured.
 
-## 6. Open it
+## 7. Open it
 
 Visit:
 

@@ -1,5 +1,13 @@
 # Troubleshooting
 
+A good first step is:
+
+```bash
+dev-domains doctor
+```
+
+That checks for common setup problems.
+
 ## `*.test` does not resolve
 
 Check the macOS resolver file:
