@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+require_cmd() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Error: required command not found: $1" >&2
+    exit 1
+  fi
+}
+
+require_cmd brew
+require_cmd caddy
+require_cmd dnsmasq
+
 BREW_PREFIX="$(brew --prefix)"
 DNSMASQ_CONF_DIR="$BREW_PREFIX/etc/dnsmasq.d"
 DNSMASQ_MAIN_CONF="$BREW_PREFIX/etc/dnsmasq.conf"
@@ -25,11 +36,12 @@ sudo mkdir -p "$RESOLVER_DIR"
 printf 'nameserver 127.0.0.1\n' | sudo tee "$RESOLVER_FILE" >/dev/null
 
 echo
-echo "Starting dnsmasq via Homebrew..."
+echo "Starting dnsmasq and caddy via Homebrew..."
 brew services restart dnsmasq
+brew services restart caddy || brew services start caddy
 
 echo
 echo "Done. Next steps:"
-echo "  1. Start Caddy with: caddy run --config $REPO_ROOT/caddy/Caddyfile"
-echo "  2. Or run: brew services start caddy"
-echo "  3. Test DNS with: dig flux.test @127.0.0.1"
+echo "  1. Start your dev servers"
+echo "  2. Test DNS with: dig flux.test @127.0.0.1"
+echo "  3. Open: http://flux.test"

@@ -23,6 +23,11 @@ brew tap gstark/dev-domains https://github.com/gstark/homebrew-dev-domains
 brew install dev-domains
 ```
 
+This will also install:
+
+- `caddy`
+- `dnsmasq`
+
 Or, if you use standard tap naming, often just:
 
 ```bash
@@ -51,15 +56,17 @@ brew install https://raw.githubusercontent.com/gstark/homebrew-dev-domains/main/
 
 ## Important limitation
 
-Homebrew should not silently:
+Homebrew can install dependencies automatically, but it should not silently perform privileged machine setup during formula installation.
 
-- modify `/etc/resolver`
-- start services
-- write machine-specific config during install
+In particular, formula installation should not modify `/etc/resolver` behind the user's back.
 
-So the formula should install files and helper commands, then show post-install instructions.
+So the formula installs files and helper commands, then the user runs:
 
-That is why `dev-domains setup` remains a manual step.
+```bash
+dev-domains setup
+```
+
+That command performs the machine-local setup, asks for sudo when needed, and starts the relevant Homebrew services.
 
 ## Release flow
 

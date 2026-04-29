@@ -31,6 +31,8 @@ Use `.test`.
 
 ## Quick start
 
+### From source
+
 1. Install dependencies:
 
    ```bash
@@ -43,15 +45,37 @@ Use `.test`.
    ./scripts/setup-macos.sh
    ```
 
-3. Start Caddy:
+3. Start your dev servers.
+
+4. Open:
+
+   - `http://flux.test`
+   - `http://dashboard.test`
+   - `http://aipro.test`
+   - `http://observe.test`
+
+### Via Homebrew
+
+1. Install `dev-domains`:
 
    ```bash
-   make run-caddy
+   brew tap gstark/dev-domains
+   brew install dev-domains
    ```
 
-4. Start your dev servers.
+   Homebrew will install `caddy` and `dnsmasq` automatically.
 
-5. Open:
+2. Run setup:
+
+   ```bash
+   dev-domains setup
+   ```
+
+   This still needs sudo because it creates `/etc/resolver/test`.
+
+3. Start your dev servers.
+
+4. Open:
 
    - `http://flux.test`
    - `http://dashboard.test`
@@ -94,6 +118,7 @@ No `/etc/hosts` edits are needed.
 - If a dev server rejects custom hostnames, configure that app to allow them.
 - Some frameworks also need `--host 0.0.0.0` or similar.
 - HTTPS is supported too; see the HTTPS doc.
+- `brew install dev-domains` can install dependencies automatically, but it should not silently perform privileged system setup during formula installation.
 
 ## Docs
 
