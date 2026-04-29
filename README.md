@@ -1,6 +1,8 @@
-# local-dev-domains
+# dev-domains
 
 Friendly local domains for multiple dev servers using **Caddy** + **dnsmasq** on macOS.
+
+`dev-domains` gives your local apps stable URLs like `flux.test` and `dashboard.test`, while each app continues running on its normal dev port.
 
 Examples:
 
@@ -13,7 +15,7 @@ App configs live in `caddy/apps/*.caddy`, so each project can have its own small
 
 ## Why this exists
 
-When you run several local apps at once, remembering ports gets annoying. This setup gives each app a stable hostname while keeping the app itself on its normal dev port.
+When you run several local apps at once, remembering ports gets annoying. `dev-domains` gives each app a stable hostname while keeping the app itself on its normal dev port.
 
 ## Stack
 
@@ -100,3 +102,8 @@ No `/etc/hosts` edits are needed.
 - [Local HTTPS](./docs/https.md)
 - [Repo structure](./docs/repo-structure.md)
 - [Troubleshooting](./docs/troubleshooting.md)
+- [Contributing](./CONTRIBUTING.md)
+
+## License
+
+[MIT](./LICENSE)
