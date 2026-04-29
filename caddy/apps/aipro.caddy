@@ -1,0 +1,3 @@
+aipro.test {
+	reverse_proxy localhost:5173
+}

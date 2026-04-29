@@ -1,0 +1,6 @@
+{
+	# Optional global options go here.
+	# For local HTTPS, Caddy can automatically manage a local CA.
+}
+
+import ./apps/*.caddy

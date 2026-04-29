@@ -1,0 +1,3 @@
+flux.test {
+	reverse_proxy localhost:3000
+}

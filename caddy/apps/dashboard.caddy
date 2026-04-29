@@ -1,0 +1,3 @@
+dashboard.test {
+	reverse_proxy localhost:3001
+}
