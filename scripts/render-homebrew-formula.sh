@@ -24,7 +24,7 @@ fi
 
 TAG="$1"
 OUT="${2:-}"
-REPO="${GITHUB_REPOSITORY:-gstark/dev-domains}"
+REPO="${GITHUB_REPOSITORY:-gstark/homebrew-dev-domains}"
 URL="https://github.com/${REPO}/archive/refs/tags/${TAG}.tar.gz"
 TMP_FILE="$(mktemp /tmp/dev-domains-${TAG}.XXXXXX.tar.gz)"
 trap 'rm -f "$TMP_FILE"' EXIT
@@ -38,7 +38,7 @@ FORMULA_CONTENT=$(cat <<EOF
 # Do not edit the url or sha256 by hand; regenerate it from a release tag instead.
 class DevDomains < Formula
   desc "Friendly local domains for multiple dev servers using Caddy and lvh.me"
-  homepage "https://github.com/gstark/dev-domains"
+  homepage "https://github.com/gstark/homebrew-dev-domains"
   url "${URL}"
   sha256 "${SHA256}"
   license "MIT"

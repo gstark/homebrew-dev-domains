@@ -2,8 +2,8 @@
 # Do not edit the url or sha256 by hand; regenerate it from a release tag instead.
 class DevDomains < Formula
   desc "Friendly local domains for multiple dev servers using Caddy and lvh.me"
-  homepage "https://github.com/gstark/dev-domains"
-  url "https://github.com/gstark/dev-domains/archive/refs/tags/v0.1.5.tar.gz"
+  homepage "https://github.com/gstark/homebrew-dev-domains"
+  url "https://github.com/gstark/homebrew-dev-domains/archive/refs/tags/v0.1.5.tar.gz"
   sha256 "b7f45599b55dee1c0bb205d55bb512531a2340d5a63a2dcf83b42bf3f4c5fd26"
   license "MIT"
 

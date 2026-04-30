@@ -2,15 +2,21 @@
 
 Yes, `dev-domains` can be installed from GitHub with Homebrew.
 
-## Recommended approach: a tap repo
+## Recommended approach: a Homebrew tap
 
-Create a separate tap repository:
+The canonical repository is:
 
 ```text
-homebrew-dev-domains
+gstark/homebrew-dev-domains
 ```
 
-Under that repo, place:
+Homebrew maps that repository to the tap name:
+
+```text
+gstark/dev-domains
+```
+
+The formula lives at:
 
 ```text
 Formula/dev-domains.rb
@@ -67,9 +73,9 @@ That command starts Caddy and uses `lvh.me` hostnames. No privileged `/etc/resol
 
 For each release:
 
-1. Tag and push the main repo release, for example `v0.1.0`
+1. Tag and push the release, for example `v0.1.0`
 2. Render the formula from that tag
-3. Commit the rendered formula in the tap repo, or let GitHub Actions do it for you
+3. Commit the rendered formula, or let GitHub Actions do it for you
 
 ### Render locally
 
@@ -97,7 +103,7 @@ On each published GitHub release it will:
 To enable automatic tap updates, configure:
 
 - repository variable `HOMEBREW_TAP_REPO` — for example `gstark/homebrew-dev-domains`
-- repository secret `HOMEBREW_TAP_TOKEN` — a token with push access to that tap repo
+- repository secret `HOMEBREW_TAP_TOKEN` — a token with push access to that repo
 
 ## Formula in this repo
 
