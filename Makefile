@@ -3,17 +3,16 @@ SHELL := /bin/bash
 CADDYFILE := ./caddy/Caddyfile
 CADDY_APPS_DIR := ./caddy/apps
 
-.PHONY: setup run-caddy reload-caddy validate-caddy start-services stop-services restart-dnsmasq new-app help
+.PHONY: setup run-caddy reload-caddy validate-caddy start-services stop-services new-app help
 
 help:
 	@echo "Available targets:"
-	@echo "  make setup            # Configure dnsmasq + macOS resolver"
+	@echo "  make setup            # Start Caddy for nip.io-based local domains"
 	@echo "  make run-caddy        # Run Caddy in the foreground"
 	@echo "  make reload-caddy     # Reload Caddy config"
 	@echo "  make validate-caddy   # Validate Caddy config"
-	@echo "  make start-services   # Start dnsmasq and caddy via Homebrew"
-	@echo "  make stop-services    # Stop dnsmasq and caddy via Homebrew"
-	@echo "  make restart-dnsmasq  # Restart dnsmasq via Homebrew"
+	@echo "  make start-services   # Start caddy via Homebrew"
+	@echo "  make stop-services    # Stop caddy via Homebrew"
 	@echo "  make new-app NAME=foo PORT=3000  # Create app config (legacy helper)"
 
 setup:
@@ -29,15 +28,10 @@ validate-caddy:
 	caddy validate --config $(CADDYFILE)
 
 start-services:
-	brew services start dnsmasq
 	brew services start caddy
 
 stop-services:
-	brew services stop dnsmasq
 	brew services stop caddy
-
-restart-dnsmasq:
-	brew services restart dnsmasq
 
 new-app:
 	@test -n "$(NAME)" || (echo "NAME is required, e.g. make new-app NAME=flux PORT=3000" && exit 1)

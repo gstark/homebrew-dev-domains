@@ -1,3 +1,3 @@
-aipro.test {
+aipro.127.0.0.1.nip.io {
 	reverse_proxy localhost:5173
 }

@@ -9,12 +9,11 @@ Thanks for contributing to `dev-domains`.
 - macOS
 - Homebrew
 - `caddy`
-- `dnsmasq`
 
 Install dependencies:
 
 ```bash
-brew install caddy dnsmasq
+brew install caddy
 ```
 
 ## Local workflow
@@ -53,6 +52,5 @@ When filing an issue, include:
 - macOS version
 - Homebrew version
 - Caddy version
-- dnsmasq version
 - the exact command you ran
 - relevant logs or error messages

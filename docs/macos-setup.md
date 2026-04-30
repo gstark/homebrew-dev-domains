@@ -3,34 +3,19 @@
 ## Install dependencies
 
 ```bash
-brew install caddy dnsmasq
+brew install caddy
 ```
 
-## Configure dnsmasq
-
-This repo includes `dnsmasq/dev.conf`:
-
-```ini
-address=/.test/127.0.0.1
-```
-
-The setup script copies it into Homebrew's dnsmasq config directory.
-
-## Configure the macOS resolver
-
-Create `/etc/resolver/test` with:
-
-```text
-nameserver 127.0.0.1
-```
-
-That tells macOS to send `.test` DNS requests to local dnsmasq.
-
-## Start services
+## Start Caddy
 
 ```bash
-brew services start dnsmasq
 brew services start caddy
+```
+
+Or run the helper:
+
+```bash
+dev-domains setup
 ```
 
 Or run Caddy manually:
@@ -42,7 +27,7 @@ make run-caddy
 ## Verify DNS
 
 ```bash
-dig flux.test @127.0.0.1
+dig flux.127.0.0.1.nip.io
 ```
 
 Expected result includes:
@@ -53,10 +38,10 @@ Expected result includes:
 
 ## Verify proxying
 
-Start the app on port `3000`, then open:
+Start the app on port `9000`, then open:
 
 ```text
-http://flux.test
+http://flux.127.0.0.1.nip.io
 ```
 
 ## Optional: enable local HTTPS trust
@@ -65,7 +50,7 @@ http://flux.test
 caddy trust
 ```
 
-Then you can use `https://flux.test` style URLs.
+Then you can use `https://flux.127.0.0.1.nip.io` style URLs.
 
 ## Reloading Caddy after config changes
 

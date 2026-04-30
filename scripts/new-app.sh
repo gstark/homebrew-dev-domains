@@ -8,6 +8,7 @@ usage() {
 
 NAME=""
 PORT=""
+NIP_IO_IP="${DEV_DOMAINS_IP:-127.0.0.1}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -39,6 +40,7 @@ fi
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TARGET_DIR="$REPO_ROOT/caddy/apps"
 TARGET_FILE="$TARGET_DIR/$NAME.caddy"
+HOSTNAME="$NAME.$NIP_IO_IP.nip.io"
 
 mkdir -p "$TARGET_DIR"
 
@@ -48,10 +50,11 @@ if [[ -e "$TARGET_FILE" ]]; then
 fi
 
 cat > "$TARGET_FILE" <<EOF
-$NAME.test {
+$HOSTNAME {
 	reverse_proxy localhost:$PORT
 }
 EOF
 
 echo "Created $TARGET_FILE"
+echo "URL: http://$HOSTNAME"
 echo "Next: reload Caddy with 'dev-domains reload'"

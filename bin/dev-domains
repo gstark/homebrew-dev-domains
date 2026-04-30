@@ -9,6 +9,7 @@ fi
 SCRIPTS_DIR="$ROOT/scripts"
 CADDYFILE="$ROOT/caddy/Caddyfile"
 APPS_DIR="$ROOT/caddy/apps"
+NIP_IO_IP="${DEV_DOMAINS_IP:-127.0.0.1}"
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -21,8 +22,12 @@ app_file_for_name() {
   printf '%s/%s.caddy' "$APPS_DIR" "$1"
 }
 
+app_hostname_for_name() {
+  printf '%s.%s.nip.io' "$1" "$NIP_IO_IP"
+}
+
 app_url_for_name() {
-  printf 'http://%s.test' "$1"
+  printf 'http://%s' "$(app_hostname_for_name "$1")"
 }
 
 list_apps() {
@@ -83,7 +88,7 @@ edit_app() {
   fi
 
   cat > "$file" <<EOF
-$name.test {
+$(app_hostname_for_name "$name") {
 	reverse_proxy localhost:$port
 }
 EOF
@@ -180,16 +185,12 @@ status() {
   echo "  caddyfile: $CADDYFILE"
   echo "  apps:      $APPS_DIR"
   echo
-  echo "Services:"
-  echo "  dnsmasq: $(service_state dnsmasq)"
-  echo "  caddy:   $(service_state caddy)"
+  echo "Hostnames:"
+  echo "  base IP:   $NIP_IO_IP"
+  echo "  pattern:   <name>.$NIP_IO_IP.nip.io"
   echo
-  echo "Resolver:"
-  if [[ -f /etc/resolver/test ]]; then
-    echo "  /etc/resolver/test: present"
-  else
-    echo "  /etc/resolver/test: missing"
-  fi
+  echo "Services:"
+  echo "  caddy:   $(service_state caddy)"
   echo
   echo "Apps:"
   list_apps
@@ -197,11 +198,13 @@ status() {
 
 doctor() {
   local name="${1:-flux}"
+  local host
+  host="$(app_hostname_for_name "$name")"
   echo "dev-domains doctor"
   echo
 
   local missing=0
-  for cmd in brew caddy dnsmasq dig; do
+  for cmd in brew caddy dig; do
     if command -v "$cmd" >/dev/null 2>&1; then
       echo "[ok] command found: $cmd"
     else
@@ -210,20 +213,6 @@ doctor() {
     fi
   done
 
-  if [[ -f /etc/resolver/test ]]; then
-    echo "[ok] resolver file exists: /etc/resolver/test"
-  else
-    echo "[missing] resolver file missing: /etc/resolver/test"
-    missing=1
-  fi
-
-  if [[ "$(service_state dnsmasq)" == "started" ]]; then
-    echo "[ok] dnsmasq service is started"
-  else
-    echo "[warn] dnsmasq service does not appear started"
-    missing=1
-  fi
-
   if [[ "$(service_state caddy)" == "started" ]]; then
     echo "[ok] caddy service is started"
   else
@@ -231,10 +220,10 @@ doctor() {
   fi
 
   if command -v dig >/dev/null 2>&1; then
-    if dig +short "$name.test" @127.0.0.1 | grep -qx '127.0.0.1'; then
-      echo "[ok] DNS resolves for $name.test via 127.0.0.1"
+    if dig +short "$host" | grep -qx "$NIP_IO_IP"; then
+      echo "[ok] DNS resolves for $host"
     else
-      echo "[warn] DNS did not resolve $name.test to 127.0.0.1 via local dnsmasq"
+      echo "[warn] DNS did not resolve $host to $NIP_IO_IP"
       missing=1
     fi
   fi
@@ -253,8 +242,8 @@ usage() {
 Usage: dev-domains <command> [args]
 
 Commands:
-  setup                             Run macOS dnsmasq/resolver setup
-  install-and-setup                 Install caddy and dnsmasq, then run setup
+  setup                             Start or restart Caddy for nip.io-based local domains
+  install-and-setup                 Install caddy, then run setup
   run                               Run Caddy with the bundled config
   reload                            Reload Caddy with the bundled config
   validate                          Validate the bundled Caddy config
@@ -264,8 +253,8 @@ Commands:
   list-apps                         List app configs
   remove-app --name NAME            Remove an app config file
   open --name NAME                  Open an app in the browser
-  status                            Show services, resolver, and configured apps
-  doctor [name]                     Verify local setup, optionally testing NAME.test
+  status                            Show Caddy status and configured apps
+  doctor [name]                     Verify local setup, optionally testing NAME.$NIP_IO_IP.nip.io
   paths                             Print important installed paths
   help                              Show this help
 EOF
@@ -279,7 +268,7 @@ case "$cmd" in
     exec "$SCRIPTS_DIR/setup-macos.sh"
     ;;
   install-and-setup)
-    brew install caddy dnsmasq
+    brew install caddy
     exec "$SCRIPTS_DIR/setup-macos.sh"
     ;;
   run)

@@ -5,7 +5,6 @@
 - `README.md` — overview and quick start
 - `Makefile` — convenience commands
 - `scripts/` — helper scripts
-- `dnsmasq/` — dnsmasq config snippets
 - `caddy/` — Caddy config
 - `docs/` — setup and troubleshooting docs
 
@@ -21,7 +20,7 @@ This makes it easy to add or remove a project without editing one large config f
 `caddy/apps/flux.caddy`
 
 ```caddy
-flux.test {
-  reverse_proxy localhost:3000
+flux.127.0.0.1.nip.io {
+  reverse_proxy localhost:9000
 }
 ```

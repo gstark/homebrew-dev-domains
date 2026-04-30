@@ -1,15 +1,15 @@
 # dev-domains
 
-Friendly local domains for multiple dev servers using **Caddy** + **dnsmasq** on macOS.
+Friendly local domains for multiple dev servers using **Caddy** + **nip.io**.
 
-`dev-domains` gives your local apps stable URLs like `flux.test` and `dashboard.test`, while each app continues running on its normal dev port.
+`dev-domains` gives your local apps stable URLs like `flux.127.0.0.1.nip.io` and `dashboard.127.0.0.1.nip.io`, while each app continues running on its normal dev port.
 
 Examples:
 
-- `http://flux.test` -> `localhost:3000`
-- `http://dashboard.test` -> `localhost:3001`
-- `http://aipro.test` -> `localhost:5173`
-- `http://observe.test` -> `localhost:8080`
+- `http://flux.127.0.0.1.nip.io` -> `localhost:9000`
+- `http://dashboard.127.0.0.1.nip.io` -> `localhost:3001`
+- `http://aipro.127.0.0.1.nip.io` -> `localhost:5173`
+- `http://observe.127.0.0.1.nip.io` -> `localhost:8080`
 
 App configs live in `caddy/apps/*.caddy`, so each project can have its own small file.
 
@@ -19,15 +19,10 @@ When you run several local apps at once, remembering ports gets annoying. `dev-d
 
 ## Stack
 
-- **dnsmasq**: resolves `*.test` to `127.0.0.1`
+- **nip.io**: resolves `*.127.0.0.1.nip.io` to `127.0.0.1`
 - **Caddy**: reverse proxies by hostname to the right local port
-- **macOS resolver**: tells macOS to ask local dnsmasq for `.test`
 
-## Why `.test` and not `.local`
-
-Use `.test`.
-
-`.local` is commonly used by mDNS / Bonjour and can cause conflicts. `.test` is the safer local-dev choice.
+No `dnsmasq`, `/etc/resolver`, or `/etc/hosts` edits are needed.
 
 ## Quick start
 
@@ -36,10 +31,10 @@ Use `.test`.
 1. Install dependencies:
 
    ```bash
-   brew install caddy dnsmasq
+   brew install caddy
    ```
 
-2. Run the setup script:
+2. Start Caddy:
 
    ```bash
    ./scripts/setup-macos.sh
@@ -55,10 +50,10 @@ Use `.test`.
 
 4. Open:
 
-   - `http://flux.test`
-   - `http://dashboard.test`
-   - `http://aipro.test`
-   - `http://observe.test`
+   - `http://flux.127.0.0.1.nip.io`
+   - `http://dashboard.127.0.0.1.nip.io`
+   - `http://aipro.127.0.0.1.nip.io`
+   - `http://observe.127.0.0.1.nip.io`
 
 ### Via Homebrew
 
@@ -68,8 +63,6 @@ Use `.test`.
    brew tap gstark/dev-domains
    brew install dev-domains
    ```
-
-   Homebrew will install `caddy` and `dnsmasq` automatically.
 
 2. Run setup:
 
@@ -83,24 +76,21 @@ Use `.test`.
    dev-domains install-and-setup
    ```
 
-   This still needs sudo because it creates `/etc/resolver/test`.
-
 3. Start your dev servers.
 
 4. Open:
 
-   - `http://flux.test`
-   - `http://dashboard.test`
-   - `http://aipro.test`
-   - `http://observe.test`
+   - `http://flux.127.0.0.1.nip.io`
+   - `http://dashboard.127.0.0.1.nip.io`
+   - `http://aipro.127.0.0.1.nip.io`
+   - `http://observe.127.0.0.1.nip.io`
 
 ## Repo layout
 
 - `Makefile` — convenience commands
 - `caddy/Caddyfile` — root Caddy config that imports app files
 - `caddy/apps/*.caddy` — one file per app
-- `dnsmasq/dev.conf` — dnsmasq wildcard rule for `.test`
-- `scripts/setup-macos.sh` — bootstraps resolver and dnsmasq config on macOS
+- `scripts/setup-macos.sh` — starts Caddy for local routing
 - `scripts/new-app.sh` — creates a new app config file
 - `docs/macos-setup.md` — step-by-step setup
 - `docs/adding-apps.md` — how to add more projects
@@ -159,15 +149,13 @@ Check overall status:
 dev-domains status
 ```
 
-No `/etc/hosts` edits are needed.
-
 ## Notes
 
 - If a dev server rejects custom hostnames, configure that app to allow them.
 - Some frameworks also need `--host 0.0.0.0` or similar.
+- `DEV_DOMAINS_IP` can be set if you want to generate `nip.io` hostnames for a different local IP.
 - HTTPS is supported too; see the HTTPS doc.
 - Use `dev-domains doctor` to verify your local setup.
-- `brew install dev-domains` can install dependencies automatically, but it should not silently perform privileged system setup during formula installation.
 
 ## Docs
 

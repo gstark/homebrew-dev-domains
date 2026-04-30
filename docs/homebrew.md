@@ -26,7 +26,6 @@ brew install dev-domains
 This will also install:
 
 - `caddy`
-- `dnsmasq`
 
 Or, if you use standard tap naming, often just:
 
@@ -54,19 +53,15 @@ Possible, but less polished:
 brew install https://raw.githubusercontent.com/gstark/homebrew-dev-domains/main/Formula/dev-domains.rb
 ```
 
-## Important limitation
+## Setup after install
 
-Homebrew can install dependencies automatically, but it should not silently perform privileged machine setup during formula installation.
-
-In particular, formula installation should not modify `/etc/resolver` behind the user's back.
-
-So the formula installs files and helper commands, then the user runs:
+The formula installs files and helper commands, then the user runs:
 
 ```bash
 dev-domains setup
 ```
 
-That command performs the machine-local setup, asks for sudo when needed, and starts the relevant Homebrew services.
+That command starts Caddy and uses `nip.io` hostnames. No privileged `/etc/resolver` setup is required.
 
 ## Release flow
 
