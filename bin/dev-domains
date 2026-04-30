@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="${DEV_DOMAINS_ROOT:-__DEV_DOMAINS_ROOT__}"
-if [[ "$ROOT" == "__DEV_DOMAINS_ROOT__" ]]; then
+ROOT_DEFAULT="__DEV_DOMAINS_ROOT__"
+ROOT="${DEV_DOMAINS_ROOT:-$ROOT_DEFAULT}"
+if [[ "$ROOT" == "$ROOT_DEFAULT" ]]; then
   ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
