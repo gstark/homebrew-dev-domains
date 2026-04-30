@@ -3,8 +3,8 @@
 class DevDomains < Formula
   desc "Friendly local domains for multiple dev servers using Caddy and nip.io"
   homepage "https://github.com/gstark/dev-domains"
-  url "https://github.com/gstark/dev-domains/archive/refs/tags/v0.1.1.tar.gz"
-  sha256 "a254f93fefca8fa401864c9dd913194bc3c437e767a8fa3ba555ed9124dad916"
+  url "https://github.com/gstark/dev-domains/archive/refs/tags/v0.1.2.tar.gz"
+  sha256 "ecf9c29bf550bfc0fa83107c88d9daa95f2c1a0fdf348dd4ce2d80e48167752c"
   license "MIT"
 
   depends_on "caddy"
