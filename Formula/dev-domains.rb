@@ -3,8 +3,8 @@
 class DevDomains < Formula
   desc "Friendly local domains for multiple dev servers using Caddy and lvh.me"
   homepage "https://github.com/gstark/dev-domains"
-  url "https://github.com/gstark/dev-domains/archive/refs/tags/v0.1.4.tar.gz"
-  sha256 "39e1863f989363f4b4688773c618ba9f7c2f2e2ea36939f8c564517edff74c38"
+  url "https://github.com/gstark/dev-domains/archive/refs/tags/v0.1.5.tar.gz"
+  sha256 "b7f45599b55dee1c0bb205d55bb512531a2340d5a63a2dcf83b42bf3f4c5fd26"
   license "MIT"
 
   depends_on "caddy"
