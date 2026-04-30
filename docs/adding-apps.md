@@ -2,11 +2,11 @@
 
 ## 1. Pick a hostname
 
-Use a short hostname that will become `<name>.127.0.0.1.nip.io`, for example:
+Use a short hostname that will become `<name>.lvh.me`, for example:
 
-- `billing.127.0.0.1.nip.io`
-- `search.127.0.0.1.nip.io`
-- `admin.127.0.0.1.nip.io`
+- `billing.lvh.me`
+- `search.lvh.me`
+- `admin.lvh.me`
 
 ## 2. Find the dev server port
 
@@ -40,7 +40,7 @@ caddy/apps/billing.caddy
 Equivalent manual file:
 
 ```caddy
-billing.127.0.0.1.nip.io {
+billing.lvh.me {
   reverse_proxy localhost:4321
 }
 ```
@@ -92,7 +92,7 @@ Make sure your app is actually listening on the port you configured.
 Visit:
 
 ```text
-http://billing.127.0.0.1.nip.io
+http://billing.lvh.me
 ```
 
 ## Common framework notes

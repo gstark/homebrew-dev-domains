@@ -27,7 +27,7 @@ make run-caddy
 ## Verify DNS
 
 ```bash
-dig flux.127.0.0.1.nip.io
+dig flux.lvh.me
 ```
 
 Expected result includes:
@@ -41,7 +41,7 @@ Expected result includes:
 Start the app on port `9000`, then open:
 
 ```text
-http://flux.127.0.0.1.nip.io
+http://flux.lvh.me
 ```
 
 ## Optional: enable local HTTPS trust
@@ -50,7 +50,7 @@ http://flux.127.0.0.1.nip.io
 caddy trust
 ```
 
-Then you can use `https://flux.127.0.0.1.nip.io` style URLs.
+Then you can use `https://flux.lvh.me` style URLs.
 
 ## Reloading Caddy after config changes
 

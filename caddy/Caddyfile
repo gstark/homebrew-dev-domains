@@ -1,5 +1,5 @@
 {
-	# Use Caddy's local CA for local-development hostnames like *.127.0.0.1.nip.io.
+	# Use Caddy's local CA for local-development hostnames like *.lvh.me.
 	local_certs
 }
 

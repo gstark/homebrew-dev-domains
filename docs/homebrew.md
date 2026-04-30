@@ -61,7 +61,7 @@ The formula installs files and helper commands, then the user runs:
 dev-domains setup
 ```
 
-That command starts Caddy and uses `nip.io` hostnames. No privileged `/etc/resolver` setup is required.
+That command starts Caddy and uses `lvh.me` hostnames. No privileged `/etc/resolver` setup is required.
 
 ## Release flow
 

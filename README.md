@@ -1,15 +1,15 @@
 # dev-domains
 
-Friendly local domains for multiple dev servers using **Caddy** + **nip.io**.
+Friendly local domains for multiple dev servers using **Caddy** + **lvh.me**.
 
-`dev-domains` gives your local apps stable URLs like `flux.127.0.0.1.nip.io` and `dashboard.127.0.0.1.nip.io`, while each app continues running on its normal dev port.
+`dev-domains` gives your local apps stable URLs like `flux.lvh.me` and `dashboard.lvh.me`, while each app continues running on its normal dev port.
 
 Examples:
 
-- `http://flux.127.0.0.1.nip.io` -> `localhost:9000`
-- `http://dashboard.127.0.0.1.nip.io` -> `localhost:3001`
-- `http://aipro.127.0.0.1.nip.io` -> `localhost:5173`
-- `http://observe.127.0.0.1.nip.io` -> `localhost:8080`
+- `http://flux.lvh.me` -> `localhost:9000`
+- `http://dashboard.lvh.me` -> `localhost:3001`
+- `http://aipro.lvh.me` -> `localhost:5173`
+- `http://observe.lvh.me` -> `localhost:8080`
 
 App configs live in `caddy/apps/*.caddy`, so each project can have its own small file.
 
@@ -19,10 +19,10 @@ When you run several local apps at once, remembering ports gets annoying. `dev-d
 
 ## Stack
 
-- **nip.io**: resolves `*.127.0.0.1.nip.io` to `127.0.0.1`
+- **lvh.me**: resolves `*.lvh.me` to `127.0.0.1`
 - **Caddy**: reverse proxies by hostname to the right local port
 
-No `dnsmasq`, `/etc/resolver`, or `/etc/hosts` edits are needed.
+No `dnsmasq`, `/etc/resolver`, or `/etc/hosts` edits are needed for lvh.me.
 
 ## Quick start
 
@@ -50,10 +50,10 @@ No `dnsmasq`, `/etc/resolver`, or `/etc/hosts` edits are needed.
 
 4. Open:
 
-   - `http://flux.127.0.0.1.nip.io`
-   - `http://dashboard.127.0.0.1.nip.io`
-   - `http://aipro.127.0.0.1.nip.io`
-   - `http://observe.127.0.0.1.nip.io`
+   - `http://flux.lvh.me`
+   - `http://dashboard.lvh.me`
+   - `http://aipro.lvh.me`
+   - `http://observe.lvh.me`
 
 ### Via Homebrew
 
@@ -80,10 +80,10 @@ No `dnsmasq`, `/etc/resolver`, or `/etc/hosts` edits are needed.
 
 4. Open:
 
-   - `http://flux.127.0.0.1.nip.io`
-   - `http://dashboard.127.0.0.1.nip.io`
-   - `http://aipro.127.0.0.1.nip.io`
-   - `http://observe.127.0.0.1.nip.io`
+   - `http://flux.lvh.me`
+   - `http://dashboard.lvh.me`
+   - `http://aipro.lvh.me`
+   - `http://observe.lvh.me`
 
 ## Repo layout
 
@@ -153,7 +153,7 @@ dev-domains status
 
 - If a dev server rejects custom hostnames, configure that app to allow them.
 - Some frameworks also need `--host 0.0.0.0` or similar.
-- `DEV_DOMAINS_IP` can be set if you want to generate `nip.io` hostnames for a different local IP.
+- `DEV_DOMAINS_BASE_DOMAIN` can be set if you want to generate hostnames for a different base domain.
 - HTTPS is supported too; see the HTTPS doc.
 - Use `dev-domains doctor` to verify your local setup.
 

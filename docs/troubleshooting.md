@@ -8,12 +8,12 @@ dev-domains doctor
 
 That checks for common setup problems.
 
-## `*.nip.io` does not resolve
+## `*.lvh.me` does not resolve
 
 Check lookup directly:
 
 ```bash
-dig flux.127.0.0.1.nip.io
+dig flux.lvh.me
 ```
 
 You should see `127.0.0.1` in the answer.

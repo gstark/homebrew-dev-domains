@@ -11,10 +11,10 @@ require_cmd() {
 require_cmd brew
 require_cmd caddy
 
-NIP_IO_IP="${DEV_DOMAINS_IP:-127.0.0.1}"
+BASE_DOMAIN="${DEV_DOMAINS_BASE_DOMAIN:-lvh.me}"
 
-echo "Using nip.io hostnames with base IP: $NIP_IO_IP"
-echo "No dnsmasq or /etc/resolver setup is required."
+echo "Using lvh.me hostnames with base domain: $BASE_DOMAIN"
+echo "No dnsmasq or /etc/resolver setup is required for lvh.me."
 
 echo
 echo "Starting Caddy via Homebrew..."
@@ -23,4 +23,4 @@ brew services restart caddy || brew services start caddy
 echo
 echo "Done. Next steps:"
 echo "  1. Start your dev servers"
-echo "  2. Open: http://flux.$NIP_IO_IP.nip.io"
+echo "  2. Open: http://flux.$BASE_DOMAIN"

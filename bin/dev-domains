@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DEFAULT="__DEV_DOMAINS_ROOT__"
-ROOT_SENTINEL="__DEV_DOMAINS_ROOT_SENTINEL__"
-ROOT="${DEV_DOMAINS_ROOT:-$ROOT_DEFAULT}"
-if [[ "$ROOT_DEFAULT" == "$ROOT_SENTINEL" && "$ROOT" == "$ROOT_DEFAULT" ]]; then
+ROOT_PLACEHOLDER="__DEV_DOMAINS_ROOT__"
+ROOT="${DEV_DOMAINS_ROOT:-$ROOT_PLACEHOLDER}"
+if [[ "$ROOT" == "$ROOT_PLACEHOLDER" ]]; then
   ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
 CADDYFILE="$ROOT/caddy/Caddyfile"
 APPS_DIR="$ROOT/caddy/apps"
-NIP_IO_IP="${DEV_DOMAINS_IP:-127.0.0.1}"
+BASE_DOMAIN="${DEV_DOMAINS_BASE_DOMAIN:-lvh.me}"
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -24,7 +23,7 @@ app_file_for_name() {
 }
 
 app_hostname_for_name() {
-  printf '%s.%s.nip.io' "$1" "$NIP_IO_IP"
+  printf '%s.%s' "$1" "$BASE_DOMAIN"
 }
 
 app_url_for_name() {
@@ -166,15 +165,15 @@ setup_cmd() {
   require_cmd brew
   require_cmd caddy
 
-  echo "Using nip.io hostnames with base IP: $NIP_IO_IP"
-  echo "No dnsmasq or /etc/resolver setup is required."
+  echo "Using lvh.me hostnames with base domain: $BASE_DOMAIN"
+  echo "No dnsmasq or /etc/resolver setup is required for lvh.me."
   echo
   echo "Starting Caddy via Homebrew..."
   brew services restart caddy || brew services start caddy
   echo
   echo "Done. Next steps:"
   echo "  1. Start your dev servers"
-  echo "  2. Open: http://flux.$NIP_IO_IP.nip.io"
+  echo "  2. Open: http://flux.$BASE_DOMAIN"
 }
 
 new_app() {
@@ -251,8 +250,8 @@ status() {
   echo "  apps:      $APPS_DIR"
   echo
   echo "Hostnames:"
-  echo "  base IP:   $NIP_IO_IP"
-  echo "  pattern:   <name>.$NIP_IO_IP.nip.io"
+  echo "  base:      $BASE_DOMAIN"
+  echo "  pattern:   <name>.$BASE_DOMAIN"
   echo
   echo "Services:"
   echo "  caddy:   $(service_state caddy)"
@@ -285,10 +284,10 @@ doctor() {
   fi
 
   if command -v dig >/dev/null 2>&1; then
-    if dig +short "$host" | grep -qx "$NIP_IO_IP"; then
+    if dig +short "$host" | grep -Eq '^(127\.0\.0\.1|::1)$'; then
       echo "[ok] DNS resolves for $host"
     else
-      echo "[warn] DNS did not resolve $host to $NIP_IO_IP"
+      echo "[warn] DNS did not resolve $host to 127.0.0.1 or ::1"
       missing=1
     fi
   fi
@@ -307,7 +306,7 @@ usage() {
 Usage: dev-domains <command> [args]
 
 Commands:
-  setup                             Start or restart Caddy for nip.io-based local domains
+  setup                             Start or restart Caddy for lvh.me-based local domains
   install-and-setup                 Install caddy, then run setup
   run                               Run Caddy with the bundled config
   reload                            Reload Caddy with the bundled config
@@ -319,7 +318,7 @@ Commands:
   remove-app --name NAME            Remove an app config file
   open --name NAME                  Open an app in the browser
   status                            Show Caddy status and configured apps
-  doctor [name]                     Verify local setup, optionally testing NAME.$NIP_IO_IP.nip.io
+  doctor [name]                     Verify local setup, optionally testing NAME.$BASE_DOMAIN
   paths                             Print important installed paths
   help                              Show this help
 EOF

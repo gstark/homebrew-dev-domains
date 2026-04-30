@@ -1,3 +1,3 @@
-aipro.127.0.0.1.nip.io {
+aipro.lvh.me {
 	reverse_proxy localhost:5173
 }

@@ -20,7 +20,7 @@ This makes it easy to add or remove a project without editing one large config f
 `caddy/apps/flux.caddy`
 
 ```caddy
-flux.127.0.0.1.nip.io {
+flux.lvh.me {
   reverse_proxy localhost:9000
 }
 ```

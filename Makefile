@@ -7,7 +7,7 @@ CADDY_APPS_DIR := ./caddy/apps
 
 help:
 	@echo "Available targets:"
-	@echo "  make setup            # Start Caddy for nip.io-based local domains"
+	@echo "  make setup            # Start Caddy for lvh.me-based local domains"
 	@echo "  make run-caddy        # Run Caddy in the foreground"
 	@echo "  make reload-caddy     # Reload Caddy config"
 	@echo "  make validate-caddy   # Validate Caddy config"

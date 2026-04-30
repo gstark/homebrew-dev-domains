@@ -6,11 +6,11 @@ Caddy is a good fit for local HTTPS because it can manage local certificates for
 
 Instead of:
 
-- `http://flux.127.0.0.1.nip.io`
+- `http://flux.lvh.me`
 
 You can use:
 
-- `https://flux.127.0.0.1.nip.io`
+- `https://flux.lvh.me`
 
 ## First-time trust step
 
@@ -33,7 +33,7 @@ caddy run --config ./caddy/Caddyfile
 Open:
 
 ```text
-https://flux.127.0.0.1.nip.io
+https://flux.lvh.me
 ```
 
 ## Notes
@@ -45,7 +45,7 @@ https://flux.127.0.0.1.nip.io
 ## Example
 
 ```caddy
-flux.127.0.0.1.nip.io {
+flux.lvh.me {
   reverse_proxy localhost:9000
 }
 ```
