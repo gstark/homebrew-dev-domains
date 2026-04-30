@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DEFAULT="__DEV_DOMAINS_ROOT__"
 ROOT="${DEV_DOMAINS_ROOT:-$ROOT_DEFAULT}"
-if [[ "$ROOT" == "$ROOT_DEFAULT" ]]; then
+if [[ "$ROOT_DEFAULT" == "__DEV_DOMAINS_ROOT__" && "$ROOT" == "$ROOT_DEFAULT" ]]; then
   ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
