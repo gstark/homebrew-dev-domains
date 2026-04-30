@@ -27,7 +27,7 @@ make run-caddy
 ## Verify DNS
 
 ```bash
-dig flux.lvh.me
+dig myapp.lvh.me
 ```
 
 Expected result includes:
@@ -38,10 +38,10 @@ Expected result includes:
 
 ## Verify proxying
 
-Start the app on port `9000`, then open:
+Create an app with `dev-domains new-app --name myapp --port 3000`, start it, then open:
 
 ```text
-http://flux.lvh.me
+http://myapp.lvh.me
 ```
 
 ## Optional: enable local HTTPS trust
@@ -50,7 +50,7 @@ http://flux.lvh.me
 caddy trust
 ```
 
-Then you can use `https://flux.lvh.me` style URLs.
+Then you can use `https://myapp.lvh.me` style URLs.
 
 ## Reloading Caddy after config changes
 

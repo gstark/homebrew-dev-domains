@@ -56,16 +56,19 @@ class DevDomains < Formula
       dev-domains installs caddy automatically via Homebrew dependencies.
 
       Important paths:
-        #{opt_pkgshare}/caddy/Caddyfile
-        #{opt_pkgshare}/caddy/apps
+        ~/.config/dev-domains/Caddyfile
+        ~/.config/dev-domains/apps
+        /opt/homebrew/etc/Caddyfile
         #{opt_pkgshare}/docs
 
       First-time setup:
         dev-domains setup
 
       That command will:
+        - create ~/.config/dev-domains with the root Caddy config
+        - point the system Caddyfile at ~/.config/dev-domains/Caddyfile
         - start or restart caddy
-        - use lvh.me hostnames like http://flux.lvh.me
+        - use lvh.me hostnames like http://myapp.lvh.me
 
       No dnsmasq or /etc/resolver setup is required for lvh.me.
     EOS

@@ -10,17 +10,19 @@
 
 ## Caddy layout
 
-- `caddy/Caddyfile` — root config that imports app configs
-- `caddy/apps/*.caddy` — one file per local app
+- `~/.config/dev-domains/Caddyfile` — active root config that imports app configs
+- `~/.config/dev-domains/apps/*.caddy` — one file per local app
 
 This makes it easy to add or remove a project without editing one large config file.
 
+The repo only ships the root Caddyfile template. App configs are user-created under `~/.config/dev-domains/apps/`.
+
 ## Example
 
-`caddy/apps/flux.caddy`
+`~/.config/dev-domains/apps/myapp.caddy`
 
 ```caddy
-flux.lvh.me {
-  reverse_proxy localhost:9000
+myapp.lvh.me {
+  reverse_proxy localhost:3000
 }
 ```

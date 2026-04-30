@@ -1,7 +1,8 @@
 SHELL := /bin/bash
 
-CADDYFILE := ./caddy/Caddyfile
-CADDY_APPS_DIR := ./caddy/apps
+CONFIG_ROOT := $(HOME)/.config/dev-domains
+CADDYFILE := $(CONFIG_ROOT)/Caddyfile
+CADDY_APPS_DIR := $(CONFIG_ROOT)/apps
 
 .PHONY: setup run-caddy reload-caddy validate-caddy start-services stop-services new-app help
 
@@ -19,13 +20,13 @@ setup:
 	./scripts/setup-macos.sh
 
 run-caddy:
-	caddy run --config $(CADDYFILE)
+	./bin/dev-domains run
 
 reload-caddy:
-	caddy reload --config $(CADDYFILE)
+	./bin/dev-domains reload
 
 validate-caddy:
-	caddy validate --config $(CADDYFILE)
+	./bin/dev-domains validate
 
 start-services:
 	brew services start caddy

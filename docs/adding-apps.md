@@ -34,7 +34,7 @@ If running from source before installation:
 That creates:
 
 ```text
-caddy/apps/billing.caddy
+~/.config/dev-domains/apps/billing.caddy
 ```
 
 Equivalent manual file:

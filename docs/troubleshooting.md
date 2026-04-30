@@ -13,7 +13,7 @@ That checks for common setup problems.
 Check lookup directly:
 
 ```bash
-dig flux.lvh.me
+dig myapp.lvh.me
 ```
 
 You should see `127.0.0.1` in the answer.
@@ -22,12 +22,12 @@ If not, check your network or DNS settings.
 
 ## Caddy returns bad gateway
 
-That usually means the target app is not running on the port in its `caddy/apps/*.caddy` file.
+That usually means the target app is not running on the port in its `~/.config/dev-domains/apps/*.caddy` file.
 
 Example checks:
 
 ```bash
-lsof -iTCP -sTCP:LISTEN -nP | rg '9000|3001|5173|8080'
+lsof -iTCP -sTCP:LISTEN -nP | rg '3000|4000|4321|8080'
 ```
 
 ## App rejects the hostname

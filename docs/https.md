@@ -6,11 +6,11 @@ Caddy is a good fit for local HTTPS because it can manage local certificates for
 
 Instead of:
 
-- `http://flux.lvh.me`
+- `http://myapp.lvh.me`
 
 You can use:
 
-- `https://flux.lvh.me`
+- `https://myapp.lvh.me`
 
 ## First-time trust step
 
@@ -25,7 +25,7 @@ You may be prompted for admin privileges so Caddy can install its local root cer
 ## Then run Caddy normally
 
 ```bash
-caddy run --config ./caddy/Caddyfile
+caddy run --config ~/.config/dev-domains/Caddyfile
 ```
 
 ## Verify
@@ -33,7 +33,7 @@ caddy run --config ./caddy/Caddyfile
 Open:
 
 ```text
-https://flux.lvh.me
+https://myapp.lvh.me
 ```
 
 ## Notes
@@ -45,7 +45,7 @@ https://flux.lvh.me
 ## Example
 
 ```caddy
-flux.lvh.me {
-  reverse_proxy localhost:9000
+myapp.lvh.me {
+  reverse_proxy localhost:3000
 }
 ```

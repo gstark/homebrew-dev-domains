@@ -1,3 +1,0 @@
-dashboard.lvh.me {
-	reverse_proxy localhost:3001
-}

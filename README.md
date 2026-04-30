@@ -2,16 +2,16 @@
 
 Friendly local domains for multiple dev servers using **Caddy** + **lvh.me**.
 
-`dev-domains` gives your local apps stable URLs like `flux.lvh.me` and `dashboard.lvh.me`, while each app continues running on its normal dev port.
+`dev-domains` gives your local apps stable URLs like `myapp.lvh.me` and `admin.lvh.me`, while each app continues running on its normal dev port.
 
 Examples:
 
-- `http://flux.lvh.me` -> `localhost:9000`
-- `http://dashboard.lvh.me` -> `localhost:3001`
-- `http://aipro.lvh.me` -> `localhost:5173`
-- `http://observe.lvh.me` -> `localhost:8080`
+- `http://myapp.lvh.me` -> `localhost:3000`
+- `http://admin.lvh.me` -> `localhost:4000`
+- `http://docs.lvh.me` -> `localhost:4321`
+- `http://api.lvh.me` -> `localhost:8080`
 
-App configs live in `caddy/apps/*.caddy`, so each project can have its own small file.
+App configs live in `~/.config/dev-domains/apps/*.caddy`, so each project can have its own small file. The repo does not ship default app entries.
 
 ## Why this exists
 
@@ -46,14 +46,17 @@ No `dnsmasq`, `/etc/resolver`, or `/etc/hosts` edits are needed for lvh.me.
    ./bin/dev-domains install-and-setup
    ```
 
-3. Start your dev servers.
+3. Create an app config:
 
-4. Open:
+   ```bash
+   ./bin/dev-domains new-app --name myapp --port 3000
+   ```
 
-   - `http://flux.lvh.me`
-   - `http://dashboard.lvh.me`
-   - `http://aipro.lvh.me`
-   - `http://observe.lvh.me`
+4. Start your dev server.
+
+5. Open:
+
+   - `http://myapp.lvh.me`
 
 ### Via Homebrew
 
@@ -76,20 +79,24 @@ No `dnsmasq`, `/etc/resolver`, or `/etc/hosts` edits are needed for lvh.me.
    dev-domains install-and-setup
    ```
 
-3. Start your dev servers.
+3. Create an app config:
 
-4. Open:
+   ```bash
+   dev-domains new-app --name myapp --port 3000
+   ```
 
-   - `http://flux.lvh.me`
-   - `http://dashboard.lvh.me`
-   - `http://aipro.lvh.me`
-   - `http://observe.lvh.me`
+4. Start your dev server.
+
+5. Open:
+
+   - `http://myapp.lvh.me`
 
 ## Repo layout
 
 - `Makefile` — convenience commands
-- `caddy/Caddyfile` — root Caddy config that imports app files
-- `caddy/apps/*.caddy` — one file per app
+- `~/.config/dev-domains/Caddyfile` — active root Caddy config
+- `~/.config/dev-domains/apps/*.caddy` — one file per app
+- `/opt/homebrew/etc/Caddyfile` — system loader that imports the user config
 - `scripts/setup-macos.sh` — starts Caddy for local routing
 - `scripts/new-app.sh` — creates a new app config file
 - `docs/macos-setup.md` — step-by-step setup
@@ -111,7 +118,7 @@ If running from source before installation:
 
 That creates:
 
-- `caddy/apps/newapp.caddy`
+- `~/.config/dev-domains/apps/newapp.caddy`
 
 List apps:
 

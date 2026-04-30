@@ -7,8 +7,11 @@ if [[ "$ROOT" == "$ROOT_PLACEHOLDER" ]]; then
   ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-CADDYFILE="$ROOT/caddy/Caddyfile"
-APPS_DIR="$ROOT/caddy/apps"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+CONFIG_ROOT="${DEV_DOMAINS_CONFIG_DIR:-$CONFIG_HOME/dev-domains}"
+CADDYFILE="$CONFIG_ROOT/Caddyfile"
+APPS_DIR="$CONFIG_ROOT/apps"
+TEMPLATE_CADDYFILE="$ROOT/caddy/Caddyfile"
 BASE_DOMAIN="${DEV_DOMAINS_BASE_DOMAIN:-lvh.me}"
 
 require_cmd() {
@@ -16,6 +19,52 @@ require_cmd() {
     echo "Error: required command not found: $1" >&2
     exit 1
   fi
+}
+
+system_caddyfile_path() {
+  local brew_prefix=""
+
+  if command -v brew >/dev/null 2>&1; then
+    brew_prefix="$(brew --prefix 2>/dev/null || true)"
+  fi
+
+  if [[ -z "$brew_prefix" ]]; then
+    if [[ -d /opt/homebrew/etc ]]; then
+      brew_prefix="/opt/homebrew"
+    else
+      brew_prefix="/usr/local"
+    fi
+  fi
+
+  printf '%s/etc/Caddyfile' "$brew_prefix"
+}
+
+ensure_config_dir() {
+  mkdir -p "$APPS_DIR"
+
+  if [[ ! -f "$CADDYFILE" ]]; then
+    cp "$TEMPLATE_CADDYFILE" "$CADDYFILE"
+    echo "Created $CADDYFILE"
+  fi
+}
+
+install_system_caddyfile_loader() {
+  local system_caddyfile
+  system_caddyfile="$(system_caddyfile_path)"
+  mkdir -p "$(dirname "$system_caddyfile")"
+
+  if [[ -f "$system_caddyfile" ]] && ! grep -Fq "$CADDYFILE" "$system_caddyfile"; then
+    local backup
+    backup="$system_caddyfile.dev-domains.bak"
+    cp "$system_caddyfile" "$backup"
+    echo "Backed up existing system Caddyfile to $backup"
+  fi
+
+  cat > "$system_caddyfile" <<EOF
+import $CADDYFILE
+EOF
+
+  echo "Updated system Caddyfile: $system_caddyfile"
 }
 
 app_file_for_name() {
@@ -79,6 +128,8 @@ edit_app() {
     echo "Usage: dev-domains edit-app --name NAME --port PORT" >&2
     return 1
   fi
+
+  ensure_config_dir
 
   local file
   file="$(app_file_for_name "$name")"
@@ -165,6 +216,9 @@ setup_cmd() {
   require_cmd brew
   require_cmd caddy
 
+  ensure_config_dir
+  install_system_caddyfile_loader
+
   echo "Using lvh.me hostnames with base domain: $BASE_DOMAIN"
   echo "No dnsmasq or /etc/resolver setup is required for lvh.me."
   echo
@@ -172,8 +226,9 @@ setup_cmd() {
   brew services restart caddy || brew services start caddy
   echo
   echo "Done. Next steps:"
-  echo "  1. Start your dev servers"
-  echo "  2. Open: http://flux.$BASE_DOMAIN"
+  echo "  1. Create an app config: dev-domains new-app --name myapp --port 3000"
+  echo "  2. Start your dev server"
+  echo "  3. Open: http://myapp.$BASE_DOMAIN"
 }
 
 new_app() {
@@ -205,9 +260,10 @@ new_app() {
     return 1
   fi
 
+  ensure_config_dir
+
   local file
   file="$(app_file_for_name "$name")"
-  mkdir -p "$APPS_DIR"
 
   if [[ -e "$file" ]]; then
     echo "Refusing to overwrite existing file: $file" >&2
@@ -245,9 +301,11 @@ status() {
   echo "dev-domains status"
   echo
   echo "Paths:"
-  echo "  root:      $ROOT"
-  echo "  caddyfile: $CADDYFILE"
-  echo "  apps:      $APPS_DIR"
+  echo "  root:             $ROOT"
+  echo "  config root:      $CONFIG_ROOT"
+  echo "  caddyfile:        $CADDYFILE"
+  echo "  apps:             $APPS_DIR"
+  echo "  system caddyfile: $(system_caddyfile_path)"
   echo
   echo "Hostnames:"
   echo "  base:      $BASE_DOMAIN"
@@ -276,6 +334,20 @@ doctor() {
       missing=1
     fi
   done
+
+  if [[ -f "$CADDYFILE" ]]; then
+    echo "[ok] config exists: $CADDYFILE"
+  else
+    echo "[warn] config not found: $CADDYFILE"
+    missing=1
+  fi
+
+  if [[ -f "$(system_caddyfile_path)" ]] && grep -Fq "$CADDYFILE" "$(system_caddyfile_path)"; then
+    echo "[ok] system Caddyfile loads dev-domains config"
+  else
+    echo "[warn] system Caddyfile is not loading $CADDYFILE"
+    missing=1
+  fi
 
   if [[ "$(service_state caddy)" == "started" ]]; then
     echo "[ok] caddy service is started"
@@ -306,11 +378,11 @@ usage() {
 Usage: dev-domains <command> [args]
 
 Commands:
-  setup                             Start or restart Caddy for lvh.me-based local domains
+  setup                             Create ~/.config/dev-domains and point system Caddyfile at it
   install-and-setup                 Install caddy, then run setup
-  run                               Run Caddy with the bundled config
-  reload                            Reload Caddy with the bundled config
-  validate                          Validate the bundled Caddy config
+  run                               Run Caddy with the user config
+  reload                            Reload Caddy with the user config
+  validate                          Validate the user Caddy config
   trust                             Trust Caddy's local CA for HTTPS
   new-app --name NAME --port PORT   Create a new app config file
   edit-app --name NAME --port PORT  Update an app's port
@@ -336,12 +408,15 @@ case "$cmd" in
     setup_cmd
     ;;
   run)
+    ensure_config_dir
     exec caddy run --config "$CADDYFILE"
     ;;
   reload)
+    ensure_config_dir
     exec caddy reload --config "$CADDYFILE"
     ;;
   validate)
+    ensure_config_dir
     exec caddy validate --config "$CADDYFILE"
     ;;
   trust)
@@ -370,10 +445,12 @@ case "$cmd" in
     ;;
   paths)
     cat <<EOF
-Install root: $ROOT
-Caddyfile:    $CADDYFILE
-App configs:  $ROOT/caddy/apps
-Docs:         $ROOT/docs
+Install root:      $ROOT
+Config root:       $CONFIG_ROOT
+Caddyfile:         $CADDYFILE
+App configs:       $APPS_DIR
+System Caddyfile:  $(system_caddyfile_path)
+Docs:              $ROOT/docs
 EOF
     ;;
   help|--help|-h)
