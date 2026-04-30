@@ -7,7 +7,6 @@ if [[ "$ROOT_DEFAULT" == "__DEV_DOMAINS_ROOT__" && "$ROOT" == "$ROOT_DEFAULT" ]]
   ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-SCRIPTS_DIR="$ROOT/scripts"
 CADDYFILE="$ROOT/caddy/Caddyfile"
 APPS_DIR="$ROOT/caddy/apps"
 NIP_IO_IP="${DEV_DOMAINS_IP:-127.0.0.1}"
@@ -162,6 +161,70 @@ open_app() {
   open "$(app_url_for_name "$name")"
 }
 
+setup_cmd() {
+  require_cmd brew
+  require_cmd caddy
+
+  echo "Using nip.io hostnames with base IP: $NIP_IO_IP"
+  echo "No dnsmasq or /etc/resolver setup is required."
+  echo
+  echo "Starting Caddy via Homebrew..."
+  brew services restart caddy || brew services start caddy
+  echo
+  echo "Done. Next steps:"
+  echo "  1. Start your dev servers"
+  echo "  2. Open: http://flux.$NIP_IO_IP.nip.io"
+}
+
+new_app() {
+  local name=""
+  local port=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --name)
+        name="${2:-}"
+        shift 2
+        ;;
+      --port)
+        port="${2:-}"
+        shift 2
+        ;;
+      --help|-h)
+        echo "Usage: dev-domains new-app --name NAME --port PORT"
+        return 0
+        ;;
+      *)
+        echo "Unknown argument: $1" >&2
+        return 1
+        ;;
+    esac
+  done
+
+  if [[ -z "$name" || -z "$port" ]]; then
+    echo "Usage: dev-domains new-app --name NAME --port PORT" >&2
+    return 1
+  fi
+
+  local file
+  file="$(app_file_for_name "$name")"
+  mkdir -p "$APPS_DIR"
+
+  if [[ -e "$file" ]]; then
+    echo "Refusing to overwrite existing file: $file" >&2
+    return 1
+  fi
+
+  cat > "$file" <<EOF
+$(app_hostname_for_name "$name") {
+	reverse_proxy localhost:$port
+}
+EOF
+
+  echo "Created $file"
+  echo "URL: $(app_url_for_name "$name")"
+  echo "Next: reload Caddy with 'dev-domains reload'"
+}
+
 service_state() {
   local service="$1"
   if ! command -v brew >/dev/null 2>&1; then
@@ -266,11 +329,11 @@ shift || true
 
 case "$cmd" in
   setup)
-    exec "$SCRIPTS_DIR/setup-macos.sh"
+    setup_cmd
     ;;
   install-and-setup)
     brew install caddy
-    exec "$SCRIPTS_DIR/setup-macos.sh"
+    setup_cmd
     ;;
   run)
     exec caddy run --config "$CADDYFILE"
@@ -285,7 +348,7 @@ case "$cmd" in
     exec caddy trust
     ;;
   new-app)
-    exec "$SCRIPTS_DIR/new-app.sh" "$@"
+    new_app "$@"
     ;;
   edit-app)
     edit_app "$@"
